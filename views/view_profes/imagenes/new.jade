@@ -1,0 +1,14 @@
+extends ../../layout.jade
+extends ../home.jade
+block contenido
+	div(class="col-md-3 remove-float center-block big-top-space")
+		h1 Registro de usuario
+		form(action="/app/imagenes" method="POST")
+			div(class="form-group")
+				label(for="title") Nombre 
+				input(type="text" name="title" placeholder="nombre completo" id="title" class="form-control")
+			div
+				label(for="archivo") Cedula Identidad
+				input(type="text" name="archivo" placeholder="ci" id="archivo" class="form-control")
+			div(class="top-space")
+				input(type="submit" value="Crear Nuevo Usuario" class="btn btn-info")

@@ -1,3 +1,3 @@
-# back
-backend proyect
-jhjhjhjhjj
+# slack-clone-server
+
+[Watch the video to learn how it was made.](https://youtu.be/BpEw1PNdvkg)
