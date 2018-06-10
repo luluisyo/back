@@ -1,5 +1,5 @@
 var express = require("express");
-var Imagen = require("../models1/imagenes");
+
 var router = express.Router();
 var image_finder_middleware = require("../middlewares/find_image");
 var models = require('../models/index');
