@@ -1,4 +1,4 @@
-
+var Imagen = require("../models1/imagenes");
 var express = require("express");
 var router = express.Router();
 
@@ -132,47 +132,6 @@ res.send({
 
 
 
-router.post("/add_tut", function(req,res){
-    var ci = req.body.ci;
-    var nombre = req.body.nombre;
-  var paterno = req.body.paterno;
-  var materno = req.body.materno;
-  var correo = req.body.correo;
-  var celular = req.body.celular;
-  var mayor = req.body.mayor;
-  var parentesco = req.body.parentesco;
-  var idioma = req.body.idioma;
-  var ocupacion = req.body.ocupacion;
-
-  var tutor = new models.Tutor({
-    ci: ci, paterno: paterno, materno: materno, nombres:nombre, ocupacion: ocupacion,
-    mayor_grado: mayor, idioma: idioma, celular: celular, mail: correo, parentesco: parentesco 
-
-  })
-
-  tutor.save().then(tut => {
-    res.send({success:true})
-   
-  })
-});
-
-
-router.post("/crea", function(req,res){
-    var est = req.body.est;
-    var tut = req.body.tut;
-
-  var tutorest = new models.Tutor_estudiante({
-    Tuto_id: tut, est_id: est
-  })
-
-  tutorest.save().then(super1 => {
-    res.send({success:true})
-  })
-});
-
-
-
-
 
 
 router.get("/depto/:id", function(req,res){
@@ -297,18 +256,6 @@ models.sequelize.query('select p.nombre||'+ "' '"+'||p.apellido_pat||'+ "' '"+'|
   })
 });
 
-
-router.get("/datosestut",function(req,res){
-models.sequelize.query('select e.id,p.nombre||'+ "' '"+'||p.apellido_pat||'+ "' '"+'||p.apellido_materno as nombre from "Estudiantes" e, "Personas" p where e.per_id=p.doc_identidad')
-.then(est => {   
-  models.sequelize.query('select id,nombres||'+ "' '"+'||paterno||'+ "' '"+'||materno as nombre from "Tutors"')
-  .then(tut => {
-   res.send({est: est[0],tut: tut[0]});
-    // We don't need spread here, since only the results will be returned for select queries
-  })
-  })
-});
-
 router.delete("/deleteuser/:id",function(req,res){
 models.sequelize.query('delete from "Personas" where doc_identidad='+req.params.id)
 .then(users => {
@@ -381,7 +328,7 @@ models.sequelize.query('select distinct c.descripcion,m.mat_des,m.id from "Curri
 
 
 router.get("/mostrarnotas/:id",function(req,res){
-models.sequelize.query('select distinct m.mat_des,(select nota from "Nota" where per='+"'1'"+' and id_mat=m.id and id_est='+req.params.id+' LIMIT 1) as nota1, (select nota from "Nota" where id_mat=m.id and per='+"'2'"+' and id_est='+req.params.id+' LIMIT 1) as nota2, (select nota from "Nota" where id_mat=m.id and per='+"'3'"+' and id_est='+req.params.id+' LIMIT 1) as nota3, (select nota from "Nota" where id_mat=m.id and per='+"'4'"+' and id_est='+req.params.id+' LIMIT 1) as nota4  from "Nota" n, "Materia" m  where n.id_est='+req.params.id+' and m.id=n.id_mat')
+models.sequelize.query('select m.mat_des,(select nota from "Nota" where id=n.id and per='+"'1'"+') as nota1,(select nota from "Nota" where id=n.id and per='+"'2'"+') as nota2,(select nota from "Nota" where id=n.id and per='+"'3'"+') as nota3 from "Nota" n, "Materia" m where n.id_est='+req.params.id+' and m.id=n.id_mat')
 .then(not => { 
   console.log(not[0]);
    res.send({not: not[0]});
@@ -409,15 +356,8 @@ res.send({mat: materia,profes:profes[0],aula:aula,niv:niv[0]});
 router.get("/viewest/:id",function(req,res){
 models.sequelize.query('select e.id,p.nombre||'+ "' '"+'||p.apellido_pat||'+ "' '"+'||p.apellido_materno as nombre from "Personas" p, "Estudiantes" e where p.doc_identidad=e.per_id and e.per_id='+"'"+req.params.id+"'")
 .then(est => {
+res.send({est: est[0]});  
 
-models.sequelize.query('select tu.id,tu.paterno||'+ "' '"+'||tu.materno||'+ "' '"+'||tu.nombres as nombre from "Tutor_estudiantes" t, "Tutors" tu where t."Tuto_id"=tu.id and t.est_id='+"'"+est[0][0].id+"'")
-.then(tut => {
-models.sequelize.query('select n.niv_des from "Inscripcions" i, "Nivel_paralelos" n where i.par_id=n.id and i.est_id='+"'"+est[0][0].id+"'")
-.then(alt => {
-
-res.send({est: est[0], tut: tut[0],alt: alt[0]});  
-})
-})
   })
 });
 

@@ -1,0 +1,12 @@
+extends ../layout.jade
+block contenido
+	body
+		nav(class="large-padding black white-text")
+			ul
+				li
+					a(href="/app") Inicio
+				li
+					a(href="/app/imagenes") Mis Registros
+		p hola admin 
+		a(href="http://localhost:8080/user/add") crear usuario
+		a(href="/admin/removeSesion") Cerrar la sesión

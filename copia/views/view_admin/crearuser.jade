@@ -1,0 +1,97 @@
+extends ../layout.jade
+block contenido
+		script.
+			var depart=!{JSON.stringify(dep)};
+			var paiss=!{JSON.stringify(pais)};
+			var provin=!{JSON.stringify(prov)};
+			//Función para agregar opciones a un <select>.
+			function cargardepto() {
+			var paises = document.getElementById('pais')
+			var deptos = document.getElementById('depto')
+			var paisSeleccionada = paises.value
+			var listadeptos = [];
+			var cont=-1;
+			for(var i=0;i<depart.length;i++)
+				{if(depart[i].pais_id==paisSeleccionada){cont++;listadeptos[cont]=depart[i].departamento_des}}
+			// Se limpian los pueblos
+			deptos.innerHTML = '<option value="">Seleccione un depto...</option>'
+			if(paisSeleccionada !== ''){
+			// Se seleccionan los pueblos y se ordenan
+			paisSeleccionada = listadeptos
+			paisSeleccionada.sort()
+			// Insertamos los pueblos
+			paisSeleccionada.forEach(function(pueblo){
+			let opcion = document.createElement('option')
+			opcion.value = pueblo
+			opcion.text = pueblo
+			deptos.add(opcion)
+			});
+			}
+			}
+
+			function cargarprovin() {
+			var deptos = document.getElementById('depto')
+			var provins = document.getElementById('provin')
+			var deptoSeleccionada1 = deptos.value
+			var deptoSeleccionada = 0;
+			for(var i=0;i<depart.length;i++)
+				{if(depart[i].departamento_des==deptoSeleccionada1){deptoSeleccionada=depart[i].id;}}
+			var listaprovin = [];
+			var cont=-1;
+			for(var i=0;i<provin.length;i++)
+				{if(provin[i].depid==deptoSeleccionada){cont++;listaprovin[cont]=provin[i].pro_des}}
+			// Se limpian los pueblos
+			provins.innerHTML = '<option value="">Seleccione un depto...</option>'
+			if(deptoSeleccionada !== ''){
+			// Se seleccionan los pueblos y se ordenan
+			deptoSeleccionada = listaprovin
+			deptoSeleccionada.sort()
+			// Insertamos los pueblos
+			deptoSeleccionada.forEach(function(pueblo){
+			let opcion = document.createElement('option')
+			opcion.value = pueblo
+			opcion.text = pueblo
+			provins.add(opcion)
+			});
+			}
+			}
+			// Iniciar la carga de provincias solo para comprobar que funciona
+		div(class="col-md-4 remove-float center-block big-top-space")
+			form(action="/creando" method="POST")
+				div(class="form-group")
+					label(for="ci") documento de identidad
+					input(type="text" name="ci" placeholder="ci" id="ci" class="form-control")
+				div
+					label(for="tipo") tipo documento
+					input(type="text" name="tipo" placeholder="tipo" id="tipo" class="form-control")
+				div
+					label(for="nombre") nombres
+					input(type="text" name="nombre" placeholder="nombres" id="nombre" class="form-control")
+				div
+					label(for="ap_paterno") apellido paterno
+					input(type="text" name="ap_paterno" placeholder="paterno" id="ap_paterno" class="form-control")
+				div
+					label(for="ap_materno") apellido materno
+					input(type="text" name="ap_materno" placeholder="materno" id="ap_materno" class="form-control")
+				div
+					label(for="fecha_nac") fecha de nacimiento
+					input(type="date" name="fecha_nac" min="2018-03-25" max="2018-05-25" placeholder="fecha" id="fecha_nac" class="form-control")
+				div
+					label(for="lug_nac") Lugar de nacimiento
+					-var foo = pais
+					select#pais(name='pais', onchange='cargardepto();')
+						option(value='') selecciona un pais 
+						-for(var i=0;i<foo.length;i++)
+							option(value=foo[i].dataValues.id)= foo[i].dataValues.pais_des
+					select#depto(name='depto', onchange='cargarprovin();')
+						option(value='') Seleccione un depto
+					select#provin(name='provin')
+						option(value='') seleccione una provincia
+				div
+					label(for="password") password
+					input(type="password" name="password" placeholder="Email" id="password" class="form-control")
+				div
+					label(for="password") password
+					input(type="password" name="password" placeholder="Email" id="password" class="form-control")
+				div(class="top-space")
+					input(type="submit" value="Iniciar Sesion" class="btn btn-info")

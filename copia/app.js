@@ -16,7 +16,7 @@ var path = require('path');
 var hogan = require('hogan.js');
 var fs = require('fs');
 
-var sendgrid  = require('sendgrid')('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');
+var sendgrid  = require('sendgrid')('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');
 
 
 
@@ -69,46 +69,30 @@ app.post('/login', function(req, res) {
   });
 });
 
-var nodemailer = require('nodemailer');
+
 
 app.get('/send', function(req, res) {
 
-
-// email sender function
-
-// Definimos el transporter
-
-try{
-    var transporter = nodemailer.createTransport({
-        service: 'Gmail',
-        auth: {
-            user: 'Colegio.Bic.Lib.Simon.Bolivar@gmail.com',
-            pass: 'simonbolivar123456'
-        }
-    });
-// Definimos el email
-var mailOptions = {
-    from: 'Remitente',
-    to: 'luluispuro@gmail.com',
-    subject: 'Asunto',
-    text: 'Contenido del email'
-};
-// Enviamos el email
-transporter.sendMail(mailOptions, function(error, info){
-    if (error){
-        console.log(error);
-        res.send(500, err.message);
-    } else {
-        console.log("Email sent");
-        res.status(200).jsonp(req.body);
+  var  receiver = 'luluispuro@gmail.com';
+  var msm = 'aqui el mensaje';
+  var mailConfig = {
+    to:       receiver,
+    from:     'Colegio_Nacional_Mixto_Simon_Bolivar',
+    subject:  'Muy Buenas!',
+    html:     '<html xmlns="http://www.w3.org/1999/xhtml"> <head> Importante </head> <body>'+ msm +'</body> </html>'
+  }
+  
+  sendgrid.send(mailConfig, function(err, json) {
+    
+    var titulo = 'Email enviado correctamente';
+    var texto = 'El email se ha enviado a la siguiente dirección: ' + receiver;
+    
+    if (err) {
+      titulo = 'Se ha producido un error';
+      texto = err;
     }
-});
-
-}
-catch(error){console.log('error en el envio de notificaion')}
-
-
-
+    res.send('page');
+  });  
 });
 
 /*

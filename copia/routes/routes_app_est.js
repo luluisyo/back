@@ -1,5 +1,5 @@
 var express = require("express");
-
+var Imagen = require("../models1/imagenes");
 var router = express.Router();
 var image_finder_middleware = require("../middlewares/find_image");
 var models = require('../models/index');
@@ -20,8 +20,7 @@ router.get("/mostrarnotas/:id",function(req,res){
 models.Estudiante.findAll({where: {
     per_id: req.params.id
   }}).then(est => {
-models.sequelize.query('select distinct m.mat_des,(select nota from "Nota" where per='+"'1'"+' and id_mat=m.id and id_est='+est[0].id+' LIMIT 1) as nota1, (select nota from "Nota" where id_mat=m.id and per='+"'2'"+' and id_est='+est[0].id+' LIMIT 1) as nota2, (select nota from "Nota" where id_mat=m.id and per='+"'3'"+' and id_est='+est[0].id+' LIMIT 1) as nota3, (select nota from "Nota" where id_mat=m.id and per='+"'4'"+' and id_est='+est[0].id+' LIMIT 1) as nota4  from "Nota" n, "Materia" m  where n.id_est='+est[0].id+' and m.id=n.id_mat')
-
+models.sequelize.query('select m.mat_des,(select nota from "Nota" where id=n.id and per='+"'1'"+') as nota1,(select nota from "Nota" where id=n.id and per='+"'2'"+') as nota2,(select nota from "Nota" where id=n.id and per='+"'3'"+') as nota3 from "Nota" n, "Materia" m where n.id_est='+est[0].id+' and m.id=n.id_mat')
 .then(not => { 
   console.log(not[0]);
    res.send({not: not[0]});
@@ -52,10 +51,6 @@ models.sequelize.query('select distinct p.nombre||p.apellido_pat||p.apellido_mat
 });
 
 
-var nodemailer = require('nodemailer');
-
-
-
 router.post("/obser1",function(req,res){
 models.Profesor.findAll({where: {
     per_id: req.body.id_prof
@@ -67,42 +62,30 @@ var mail = req.body.mail;
 var obser=new models.Observacion({
 obser_des:ob,fecha:fecha,est_id:id_est,prof_id:est[0].id	
 })
-
 obser.save().then(estud =>{
 
 
-try{
 
+var  receiver = mail;
 
-  var transporter = nodemailer.createTransport({
-        service: 'Gmail',
-        auth: {
-            user: 'Colegio.Bic.Lib.Simon.Bolivar@gmail.com',
-            pass: 'simonbolivar123456'
-        }
-    });
-// Definimos el email
-var mailOptions = {
-    from: 'Remitente',
-    to: mail,
-    subject: 'IMPORTANTE',
-    text: req.body.ob
-};
-// Enviamos el email
-transporter.sendMail(mailOptions, function(error, info){
-    if (error){
-        console.log(error);
-        res.send(500, err.message);
-    } else {
-        console.log("Email sent");
-        console.log(mail);
-        res.status(200).jsonp(req.body);
+  var mailConfig = {
+    to:       receiver,
+    from:     'Colegio_Nacional_Mixto_Simon_Bolivar',
+    subject:  'Muy Buenas!',
+    html:     '<html xmlns="http://www.w3.org/1999/xhtml"> <head> Importante </head> <body>'+ req.body.ob +'</body> </html>'
+  }
+  
+  sendgrid.send(mailConfig, function(err, json) {
+    
+    var titulo = 'Email enviado correctamente';
+    var texto = 'El email se ha enviado a la siguiente dirección: ' + receiver;
+    
+    if (err) {
+      titulo = 'Se ha producido un error';
+      texto = err;
     }
-});
-
-}
-catch(error){console.log('error en el envio de notificaion')}
-
+   
+  });  
 
 
 res.send({
